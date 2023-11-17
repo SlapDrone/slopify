@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.class
+.pytest_cache/
+.venv/
+dist/
+build/
+slopify.egg-info/
+**/.mypy_cache/
+
+
+
+
+
