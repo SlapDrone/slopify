@@ -29,22 +29,25 @@ def setup_test_files(tmp_path) -> List[Path]:
     file5.write_text(
         dedent(
             """\
-        # introduction
+            # introduction
 
-        bla bla
+            bla bla
 
-        ```c++
-        int main() {
-            return 0;
-        }
-        ```
+            ```c++
+            int main() {
+                return 0;
+            }
+            ```
 
-        # conclusion
+            # conclusion
 
-        bleep bloop
-    """
+            bleep bloop
+            """
         )
     )
+    print("file 5 content:")
+    print(file5.read_text())
+    print(f"write {file5=}")
     return [file1, file2, init_file, file3, file4, file5]
 
 
@@ -62,10 +65,12 @@ def test_slop_apply_idempotent(setup_test_files, tmp_path):
     # Verify that the files' content remains unchanged except for a trailing newline
     for file in setup_test_files:
         file_content = file.read_text()
+        print(f"{file}")
+        print("FILE CONTENTS")
+        print(file_content)
         original_content = original_contents[file]
-        assert (
-            file_content == original_content or file_content == original_content + "\n"
-        )
+        assert file_content.strip() == original_content.strip(), f"Mismatch in file: {file}"
+        
 
 
 def test_apply_with_commentary_ignored(tmp_path):

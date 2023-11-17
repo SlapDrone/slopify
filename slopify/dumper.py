@@ -33,7 +33,20 @@ def get_language_from_extension(file_path: str) -> str:
 
 
 def escape_markdown_content(content: str) -> str:
-    return content.replace("```", "<!--SLOPIFY_CODE_BLOCK```-->")
+    """
+    Escape triple backticks in Markdown content outside of code blocks.
+    """
+    escaped_content = []
+    in_code_block = False
+    for line in content.splitlines():
+        if line.startswith("```"):
+            in_code_block = not in_code_block
+            escaped_content.append(line)
+        elif not in_code_block:
+            escaped_content.append(line.replace("```", "<!--SLOPIFY_CODE_BLOCK```-->"))
+        else:
+            escaped_content.append(line)
+    return "\n".join(escaped_content)
 
 
 def dump_files_to_markdown(
