@@ -48,15 +48,16 @@ def setup_test_files(tmp_path) -> List[Path]:
     return [file1, file2, init_file, file3, file4, file5]
 
 
-def test_vomit_apply_idempotent(setup_test_files, tmp_path):
+def test_slop_apply_idempotent(setup_test_files, tmp_path):
     output_md = tmp_path / "output.md"
     base_path = tmp_path
 
     # Capture the original content of the files before applying markdown
     original_contents = {file: file.read_text() for file in setup_test_files}
 
-    dump_files_to_markdown(setup_test_files, output_md, base_path=base_path)
-    apply_markdown(output_md, base_path=base_path)
+    # Generate markdown content
+    markdown_content = dump_files_to_markdown(setup_test_files, None, base_path=base_path)
+    apply_markdown(markdown_content, base_path=base_path)
 
     # Verify that the files' content remains unchanged except for a trailing newline
     for file in setup_test_files:
@@ -86,8 +87,6 @@ print('Goodbye, world!')
 ```
 Even more commentary after the code block.
 """
-    markdown_file = tmp_path / "slop.md"
-    markdown_file.write_text(markdown_content)
 
     # Create the files that should be affected
     file1 = tmp_path / "file1.py"
@@ -96,24 +95,21 @@ Even more commentary after the code block.
     file2.touch()
 
     # Run the apply command to apply the Markdown content to the files
-    apply_markdown(markdown_file)
+    apply_markdown(markdown_content, base_path=tmp_path)
 
     # Verify that only the content within the code blocks is applied to the files
     assert file1.read_text() == "print('Hello, world!')\n"
     assert file2.read_text() == "print('Goodbye, world!')\n"
 
 
-def test_vomit_slather_escape_unescape_cycle(setup_test_files, tmp_path):
+def test_slop_slather_escape_unescape_cycle(setup_test_files, tmp_path):
     output_md = tmp_path / "output.md"
-    # The base path should be the common parent directory of the setup test files
     base_path = setup_test_files[0].parent.parent
     dump_files_to_markdown(setup_test_files, output_md, base_path=base_path)
 
-    # Run the slather command to apply the content back to the files
-    apply_markdown(output_md)
+    markdown_content_str = output_md.read_text(encoding="utf-8")
+    apply_markdown(markdown_content_str, base_path=base_path)
 
-    # Verify that the files' content matches the original content, allowing for
-    # a trailing newline
     for file in setup_test_files:
         file_content = file.read_text(encoding="utf-8")
         original_content = file.read_text(encoding="utf-8")

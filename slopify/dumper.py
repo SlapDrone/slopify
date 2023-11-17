@@ -40,7 +40,7 @@ def dump_files_to_markdown(
     files: list[Path],
     output_file: ty.Optional[Path],
     base_path: ty.Optional[Path] = None,
-) -> ty.Optional[str]:
+) -> str:
     """
     Dump the contents of the given files to a Markdown file or return as a string.
 

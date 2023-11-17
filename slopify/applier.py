@@ -31,7 +31,7 @@ def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
         if file_path.endswith(".md"):
             # Unescape code blocks within Markdown files
             code = unescape_code_blocks(code)
-        full_path = (base_path or markdown_file.parent) / file_path
+        full_path = (base_path or Path.cwd()) / file_path
         full_path.parent.mkdir(parents=True, exist_ok=True)
         with full_path.open("w", encoding="utf-8") as f:
             f.write(code)
