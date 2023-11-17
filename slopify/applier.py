@@ -11,9 +11,9 @@ def unescape_code_blocks(content: str) -> str:
     return content.replace("<!--SLOPIFY_CODE_BLOCK```-->", "```")
 
 
-def apply_markdown(markdown_file: Path, base_path: ty.Optional[Path] = None):
+def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
     md = MarkdownIt()
-    tokens = md.parse(markdown_file.read_text(encoding="utf-8"))
+    tokens = md.parse(markdown_content)
 
     code_blocks = {}
     current_file_path = None

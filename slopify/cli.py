@@ -68,7 +68,8 @@ def slather(
     )
 ):
     if markdown_file:
-        apply_markdown(markdown_file)
+        markdown_content = markdown_file.read_text(encoding="utf-8")
+        apply_markdown(markdown_content)
         typer.echo(f"Applied code from {markdown_file}")
     else:
         markdown_content = pyperclip.paste()
