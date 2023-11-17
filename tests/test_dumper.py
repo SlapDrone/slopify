@@ -1,6 +1,5 @@
 import pytest
 from slopify.dumper import dump_files_to_markdown, get_language_from_extension
-from pathlib import Path
 
 
 @pytest.fixture
@@ -28,6 +27,7 @@ def nested_test_files(tmp_path):
     file_subdir.write_text("print('Subdir file')")
     return [file_nested, file_subdir]
 
+
 def test_dump_files_to_markdown(test_files, tmp_path):
     output_md = tmp_path / "output.md"
     base_path = test_files[0].parent.parent
@@ -35,15 +35,16 @@ def test_dump_files_to_markdown(test_files, tmp_path):
     expected_content = ""
     for file in sorted(test_files, key=lambda x: x.relative_to(base_path)):
         relative_path = file.relative_to(base_path)
-        language = get_language_from_extension(file.suffix.lstrip('.'))
+        language = get_language_from_extension(file.suffix.lstrip("."))
         expected_content += (
             f"# `{relative_path}`\n\n"  # Include backticks around the relative path
             f"```{language}\n"
             f"{file.read_text(encoding='utf-8')}\n"
             "```\n\n"
         )
-    actual_content = output_md.read_text(encoding='utf-8')
+    actual_content = output_md.read_text(encoding="utf-8")
     assert actual_content == expected_content
+
 
 def test_dump_files_to_markdown_empty_file(tmp_path):
     file_empty = tmp_path / "test_empty.py"
@@ -58,8 +59,9 @@ def test_dump_files_to_markdown_empty_file(tmp_path):
         "\n"
         "```\n\n"
     )
-    actual_content = output_md.read_text(encoding='utf-8')
+    actual_content = output_md.read_text(encoding="utf-8")
     assert actual_content == expected_content
+
 
 def test_dump_files_to_markdown_nested_structure(nested_test_files, tmp_path):
     output_md = tmp_path / "output_nested.md"
@@ -68,19 +70,21 @@ def test_dump_files_to_markdown_nested_structure(nested_test_files, tmp_path):
     expected_content = ""
     for file in sorted(nested_test_files, key=lambda x: x.relative_to(base_path)):
         relative_path = file.relative_to(base_path)
-        language = get_language_from_extension(file.suffix.lstrip('.'))
+        language = get_language_from_extension(file.suffix.lstrip("."))
         expected_content += (
             f"# `{relative_path}`\n\n"  # Include backticks around the relative path
             f"```{language}\n"
             f"{file.read_text(encoding='utf-8')}\n"
             "```\n\n"
         )
-    actual_content = output_md.read_text(encoding='utf-8')
+    actual_content = output_md.read_text(encoding="utf-8")
     assert actual_content == expected_content
+
 
 def test_get_language_from_extension():
     # Test the language detection from file extension
-    assert get_language_from_extension('a.py') == 'python'  # Remove the dot from the extension
-    assert get_language_from_extension('b.js') == 'javascript'
+    assert (
+        get_language_from_extension("a.py") == "python"
+    )  # Remove the dot from the extension
+    assert get_language_from_extension("b.js") == "javascript"
     # Add more assertions for different extensions
-

@@ -26,7 +26,9 @@ def setup_test_files(tmp_path) -> List[Path]:
     file4.write_text("print('have you tried ```bash\nsudo rm -rf /\n```?')")
     # add a markdown file with code blocks
     file5 = tmp_path / "README.md"
-    file5.write_text(dedent("""\
+    file5.write_text(
+        dedent(
+            """\
         # introduction
 
         bla bla
@@ -40,25 +42,30 @@ def setup_test_files(tmp_path) -> List[Path]:
         # conclusion
 
         bleep bloop
-    """))
+    """
+        )
+    )
     return [file1, file2, init_file, file3, file4, file5]
 
 
 def test_vomit_apply_idempotent(setup_test_files, tmp_path):
     output_md = tmp_path / "output.md"
     base_path = tmp_path
-    
+
     # Capture the original content of the files before applying markdown
     original_contents = {file: file.read_text() for file in setup_test_files}
-    
+
     dump_files_to_markdown(setup_test_files, output_md, base_path=base_path)
     apply_markdown(output_md, base_path=base_path)
-    
-    # Verify that the files' content remains unchanged except for a possible trailing newline
+
+    # Verify that the files' content remains unchanged except for a trailing newline
     for file in setup_test_files:
         file_content = file.read_text()
         original_content = original_contents[file]
-        assert file_content == original_content or file_content == original_content + '\n'
+        assert (
+            file_content == original_content or file_content == original_content + "\n"
+        )
+
 
 def test_apply_with_commentary_ignored(tmp_path):
     # Create a Markdown file with code blocks and extra content
@@ -95,6 +102,7 @@ Even more commentary after the code block.
     assert file1.read_text() == "print('Hello, world!')\n"
     assert file2.read_text() == "print('Goodbye, world!')\n"
 
+
 def test_vomit_slather_escape_unescape_cycle(setup_test_files, tmp_path):
     output_md = tmp_path / "output.md"
     # The base path should be the common parent directory of the setup test files
@@ -104,8 +112,11 @@ def test_vomit_slather_escape_unescape_cycle(setup_test_files, tmp_path):
     # Run the slather command to apply the content back to the files
     apply_markdown(output_md)
 
-    # Verify that the files' content matches the original content, allowing for a trailing newline
+    # Verify that the files' content matches the original content, allowing for
+    # a trailing newline
     for file in setup_test_files:
-        file_content = file.read_text(encoding='utf-8')
-        original_content = file.read_text(encoding='utf-8')
-        assert file_content == original_content or file_content == original_content + '\n'
+        file_content = file.read_text(encoding="utf-8")
+        original_content = file.read_text(encoding="utf-8")
+        assert (
+            file_content == original_content or file_content == original_content + "\n"
+        )
