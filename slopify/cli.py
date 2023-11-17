@@ -10,7 +10,7 @@ app = typer.Typer()
 def load_gitignore_patterns(directory: Path) -> pathspec.PathSpec:
     gitignore = directory / ".gitignore"
     # Include the .git directory in the ignore patterns by default
-    patterns = ["/.git/", "*/.git/", "**/.git/"]
+    patterns = ["/.git/", "*/.git/", "**/.git/", "LICENSE*"]
     if gitignore.exists():
         patterns += gitignore.read_text().splitlines()
     spec = pathspec.PathSpec.from_lines("gitwildmatch", patterns)
