@@ -36,11 +36,22 @@ def escape_markdown_content(content: str) -> str:
 def dump_files_to_markdown(
     files: list[Path], output_file: ty.Optional[Path], base_path: ty.Optional[Path] = None
 ) -> str:
+    """
+    Dump the contents of the given files to a Markdown file or return as a string.
+
+    :param files: A list of Path objects pointing to the files to be dumped.
+    :param output_file: A Path object pointing to the output Markdown file, or None.
+    :param base_path: A Path object representing the base directory from
+        which to calculate relative paths.
+    :return: The markdown content as a string if output_file is None, otherwise None.
+    """
     base_path = base_path or Path.cwd()
     markdown_content = ""
     for file_path in sorted(files):
-        if file_path.resolve() == output_file.resolve():
+        # Skip the output file if it is specified and matches the current file path
+        if output_file and file_path.resolve() == output_file.resolve():
             continue
+
         relative_path = file_path.relative_to(base_path)
         language = get_language_from_extension(file_path.suffix.lstrip("."))
         try:
@@ -50,7 +61,9 @@ def dump_files_to_markdown(
         if file_path.suffix == ".md":
             content = escape_markdown_content(content)
         markdown_content += f"# `{relative_path}`\n\n```{language}\n{content}\n```\n\n"
+    
     if output_file:
         with output_file.open("w", encoding="utf-8") as md_file:
             md_file.write(markdown_content)
-    return markdown_content
+    else:
+        return markdown_content
