@@ -2,6 +2,7 @@ import typing as ty
 import os
 from pathlib import Path
 
+
 def get_language_from_extension(file_path: str) -> str:
     extension_to_language = {
         "py": "python",
@@ -30,12 +31,16 @@ def get_language_from_extension(file_path: str) -> str:
     extension = os.path.splitext(file_path)[1].lstrip(".")
     return extension_to_language.get(extension, "")
 
+
 def escape_markdown_content(content: str) -> str:
     return content.replace("```", "<!--SLOPIFY_CODE_BLOCK```-->")
 
+
 def dump_files_to_markdown(
-    files: list[Path], output_file: ty.Optional[Path], base_path: ty.Optional[Path] = None
-) -> str:
+    files: list[Path],
+    output_file: ty.Optional[Path],
+    base_path: ty.Optional[Path] = None,
+) -> ty.Optional[str]:
     """
     Dump the contents of the given files to a Markdown file or return as a string.
 
@@ -61,9 +66,8 @@ def dump_files_to_markdown(
         if file_path.suffix == ".md":
             content = escape_markdown_content(content)
         markdown_content += f"# `{relative_path}`\n\n```{language}\n{content}\n```\n\n"
-    
+
     if output_file:
         with output_file.open("w", encoding="utf-8") as md_file:
             md_file.write(markdown_content)
-    else:
-        return markdown_content
+    return markdown_content

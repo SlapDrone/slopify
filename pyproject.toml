@@ -21,6 +21,15 @@ pytest = "^6.2.4"
 [tool.poetry.scripts]
 slopify = "slopify.cli:app"
 
+[tool.mypy]
+# Other mypy settings can go here
+
+[[tool.mypy.overrides]]
+module = [
+    "pyperclip",
+]
+ignore_missing_imports = true
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

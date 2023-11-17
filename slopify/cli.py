@@ -7,6 +7,7 @@ import pyperclip
 
 app = typer.Typer()
 
+
 def load_gitignore_patterns(directory: Path) -> pathspec.PathSpec:
     gitignore = directory / ".gitignore"
     patterns = ["/.git/", "*/.git/", "**/.git/", "LICENSE*"]
@@ -14,6 +15,7 @@ def load_gitignore_patterns(directory: Path) -> pathspec.PathSpec:
         patterns += gitignore.read_text().splitlines()
     spec = pathspec.PathSpec.from_lines("gitwildmatch", patterns)
     return spec
+
 
 @app.command()
 def slop(
@@ -52,9 +54,12 @@ def slop(
         dump_files_to_markdown(files_to_dump, output, base_path=base_path)
         typer.echo(f"Dumped contents to {output}")
     else:
-        markdown_content = dump_files_to_markdown(files_to_dump, None, base_path=Path.cwd())
+        markdown_content = dump_files_to_markdown(
+            files_to_dump, None, base_path=Path.cwd()
+        )
         pyperclip.copy(markdown_content)
         typer.echo("Copied contents to clipboard")
+
 
 @app.command()
 def slather(
@@ -72,6 +77,7 @@ def slather(
             typer.echo("Applied code from clipboard")
         else:
             typer.echo("Clipboard is empty. No code was applied.", err=True)
+
 
 if __name__ == "__main__":
     app()
