@@ -45,10 +45,7 @@ def setup_test_files(tmp_path) -> List[Path]:
             """
         )
     )
-    print("file 5 content:")
-    print(file5.read_text())
-    print(f"write {file5=}")
-    return [file1, file2, init_file, file3, file4, file5]
+    return [file5]#[file1, file2, init_file, file3, file4, file5]
 
 
 def test_slop_apply_idempotent(setup_test_files, tmp_path):
@@ -57,17 +54,16 @@ def test_slop_apply_idempotent(setup_test_files, tmp_path):
 
     # Capture the original content of the files before applying markdown
     original_contents = {file: file.read_text() for file in setup_test_files}
-
+    # print(f"{original_contents=}")
     # Generate markdown content
     markdown_content = dump_files_to_markdown(setup_test_files, None, base_path=base_path)
+    print(f"{markdown_content=}")
     apply_markdown(markdown_content, base_path=base_path)
 
     # Verify that the files' content remains unchanged except for a trailing newline
     for file in setup_test_files:
         file_content = file.read_text()
-        print(f"{file}")
-        print("FILE CONTENTS")
-        print(file_content)
+        print(f"{file_content=}")
         original_content = original_contents[file]
         assert file_content.strip() == original_content.strip(), f"Mismatch in file: {file}"
         

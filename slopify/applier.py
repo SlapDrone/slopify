@@ -16,26 +16,46 @@ def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
     tokens = md.parse(markdown_content)
 
     code_blocks = {}
+    markdown_sections = {}
     current_file_path = None
+    in_markdown_file = False
+    markdown_accumulator = []
 
     for token in tokens:
         if token.type == "heading_open" and token.tag == "h1":
             # The next token is the text of the heading, which contains the file path
             current_file_path = tokens[tokens.index(token) + 1].content.strip("`")
+            in_markdown_file = current_file_path.endswith(".md")
+            if in_markdown_file:
+                # Start accumulating Markdown content for .md files
+                markdown_accumulator = [current_file_path]
+        elif in_markdown_file:
+            # Accumulate all content for Markdown files
+            markdown_accumulator.append(token.content)
         elif token.type == "fence" and current_file_path:
             # This token contains the content of the code block
             code_blocks[current_file_path] = token.content
+        else:
+            print(f"skipping token {token.content}")
 
     # Apply the code blocks to the file system
     for file_path, code in code_blocks.items():
-        if file_path.endswith(".md"):
-            # Unescape code blocks within Markdown files
-            code = unescape_code_blocks(code)
+        print(f"raw {code=}")
         full_path = (base_path or Path.cwd()) / file_path
         full_path.parent.mkdir(parents=True, exist_ok=True)
         with full_path.open("w", encoding="utf-8") as f:
+            print(f"processed {code=}")
             f.write(code)
 
+    # Apply the Markdown sections to the file system
+    for markdown_accumulator in markdown_sections.values():
+        file_path = markdown_accumulator[0]
+        markdown_content = "\n".join(markdown_accumulator[1:])
+        markdown_content = unescape_code_blocks(markdown_content)
+        full_path = (base_path or Path.cwd()) / file_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        with full_path.open("w", encoding="utf-8") as f:
+            f.write(markdown_content)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Apply Markdown file to directory.")
