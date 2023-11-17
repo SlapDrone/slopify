@@ -65,16 +65,20 @@ def slop(
 def slather(
     markdown_file: Path = typer.Option(
         None, "--input", "-i", help="Markdown file containing the code to apply."
+    ),
+    base: Path = typer.Option(
+        None, "--base", "-b", help="Base directory for applying the code."
     )
 ):
+    base_path = base or Path.cwd()
     if markdown_file:
         markdown_content = markdown_file.read_text(encoding="utf-8")
-        apply_markdown(markdown_content)
+        apply_markdown(markdown_content, base_path=base_path)
         typer.echo(f"Applied code from {markdown_file}")
     else:
         markdown_content = pyperclip.paste()
         if markdown_content:
-            apply_markdown(markdown_content)
+            apply_markdown(markdown_content, base_path=base_path)
             typer.echo("Applied code from clipboard")
         else:
             typer.echo("Clipboard is empty. No code was applied.", err=True)
@@ -82,3 +86,4 @@ def slather(
 
 if __name__ == "__main__":
     app()
+
