@@ -122,10 +122,10 @@ def test_write_files_nested_markdown():
 
 This is a Markdown file with nested code blocks.
 
-<!--SLOPIFY_CODE_BLOCK\`\`\`python-->
+<!--SLOPIFY_CODE_BLOCK```python-->
 # This is a nested code block
 print("Hello, nested world!")
-<!--SLOPIFY_CODE_BLOCK\`\`\`-->
+<!--SLOPIFY_CODE_BLOCK```-->
 """
     )
     write_files([file_content])
