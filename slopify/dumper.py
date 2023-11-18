@@ -29,7 +29,6 @@ def get_language(file_path: Path) -> str:
         # Add more mappings if needed
     }
     extension = file_path.suffix.lstrip(".")
-    print(f"{extension=}")
     return extension_to_language.get(extension, "")
 
 
@@ -37,19 +36,7 @@ def escape_markdown_content(content: str) -> str:
     """
     Escape triple backticks in Markdown content outside of code blocks.
     """
-    escaped_content = []
-    in_code_block = False
-    print("ESCAPE")
-    print(f"{content=}")
-    for line in content.splitlines():
-        if line.startswith("```"):
-            in_code_block = not in_code_block
-            escaped_content.append(line)
-        elif not in_code_block:
-            escaped_content.append(line.replace("```", "<!--SLOPIFY_CODE_BLOCK```-->"))
-        else:
-            escaped_content.append(line)
-    return "\n".join(escaped_content)
+    return content.replace("```", "<!--SLOPIFY_CODE_BLOCK```-->")
 
 
 def dump_files_to_markdown(
@@ -75,8 +62,6 @@ def dump_files_to_markdown(
 
         relative_path = file_path.relative_to(base_path)
         language = get_language(file_path)
-        print(file_path.suffix.lstrip("."))
-        print(f"{language=}")
         try:
             content = file_path.read_text(encoding="utf-8")
         except UnicodeDecodeError:

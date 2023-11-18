@@ -131,6 +131,7 @@ def postprocess_content(file_content: FileContent) -> FileContent:
             processed_content = file_content.content[start:end].strip()
         except ValueError:
             processed_content = file_content.content
+        processed_content = unescape_code_blocks(processed_content)
         extra_content = ""
     else:
         # Handle non-Markdown files
