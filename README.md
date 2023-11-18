@@ -46,12 +46,12 @@ slopify slather -i vomit.md
 ```
 ## TODO
 
-- [] accept diffs in apply markdown
-- [] allow configurable token limit for dump with graceful failure when overbudget
-- [] allow specifying sets of interdependent files commonly needed to be assessed jointly.
+- [ ] accept diffs in apply markdown
+- [ ] allow configurable token limit for dump with graceful failure when overbudget
+- [ ] allow specifying sets of interdependent files commonly needed to be assessed jointly.
     - shell command e.g. `slopify set create my_set ...`
     - config file e.g. `slopify dump -c my_set`
-- [] automatically generate relevant context from dependent modules with some static code analysis? (nice to have)
+- [ ] automatically generate relevant context from dependent modules with some static code analysis? (nice to have)
 
 ## Disclaimer
 
