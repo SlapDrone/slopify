@@ -1,5 +1,6 @@
+from pathlib import Path
 import pytest
-from slopify.dumper import dump_files_to_markdown, get_language_from_extension
+from slopify.dumper import dump_files_to_markdown, get_language
 
 
 @pytest.fixture
@@ -35,7 +36,7 @@ def test_dump_files_to_markdown(test_files, tmp_path):
     expected_content = ""
     for file in sorted(test_files, key=lambda x: x.relative_to(base_path)):
         relative_path = file.relative_to(base_path)
-        language = get_language_from_extension(file.suffix.lstrip("."))
+        language = get_language(file)
         expected_content += (
             f"# `{relative_path}`\n\n"  # Include backticks around the relative path
             f"```{language}\n"
@@ -55,7 +56,7 @@ def test_dump_files_to_markdown_empty_file(tmp_path):
     relative_file_path = file_empty.name
     expected_content = (
         f"# `{relative_file_path}`\n\n"  # Include backticks around the file name
-        "```\n"
+        "```python\n"
         "\n"
         "```\n\n"
     )
@@ -70,7 +71,7 @@ def test_dump_files_to_markdown_nested_structure(nested_test_files, tmp_path):
     expected_content = ""
     for file in sorted(nested_test_files, key=lambda x: x.relative_to(base_path)):
         relative_path = file.relative_to(base_path)
-        language = get_language_from_extension(file.suffix.lstrip("."))
+        language = get_language(file)
         expected_content += (
             f"# `{relative_path}`\n\n"  # Include backticks around the relative path
             f"```{language}\n"
@@ -84,7 +85,7 @@ def test_dump_files_to_markdown_nested_structure(nested_test_files, tmp_path):
 def test_get_language_from_extension():
     # Test the language detection from file extension
     assert (
-        get_language_from_extension("a.py") == "python"
+        get_language(Path("a.py")) == "python"
     )  # Remove the dot from the extension
-    assert get_language_from_extension("b.js") == "javascript"
+    assert get_language(Path("b.js")) == "javascript"
     # Add more assertions for different extensions

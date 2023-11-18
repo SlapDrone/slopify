@@ -114,9 +114,8 @@ def postprocess_content(file_content: FileContent) -> FileContent:
     """
     Post-processes the content of a FileContent object based on its file type.
 
-    For Markdown files (.md), it unescapes commented-out code blocks.
-    For non-Markdown files, it extracts only the content of the single code block,
-    handling the potential presence of a language identifier.
+    For Markdown files (.md), it unescapes commented-out code blocks and removes the enclosing code block syntax.
+    For non-Markdown files, it extracts only the content of the single code block, handling the potential presence of a language identifier.
 
     Args:
         file_content (FileContent): The FileContent object to be post-processed.
@@ -125,11 +124,17 @@ def postprocess_content(file_content: FileContent) -> FileContent:
         FileContent: The post-processed FileContent object.
     """
     if file_content.path.suffix == '.md':
-        processed_content = file_content.content.replace("<!--SLOPIFY_CODE_BLOCK```-->", "```")
+        # Remove enclosing code block syntax for Markdown files
+        try:
+            start = file_content.content.index("```markdown") + len("```markdown")
+            end = file_content.content.rindex("```")
+            processed_content = file_content.content[start:end].strip()
+        except ValueError:
+            processed_content = file_content.content
         extra_content = ""
     else:
+        # Handle non-Markdown files
         try:
-            # Find the start of the code block (accounting for a language identifier)
             start = file_content.content.index("```") + 3
             end_of_start_line = file_content.content.index('\n', start)
             start_content = end_of_start_line + 1

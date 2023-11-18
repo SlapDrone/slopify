@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 
-def get_language_from_extension(file_path: str) -> str:
+def get_language(file_path: Path) -> str:
     extension_to_language = {
         "py": "python",
         "js": "javascript",
@@ -28,7 +28,8 @@ def get_language_from_extension(file_path: str) -> str:
         "pl": "perl",
         # Add more mappings if needed
     }
-    extension = os.path.splitext(file_path)[1].lstrip(".")
+    extension = file_path.suffix.lstrip(".")
+    print(f"{extension=}")
     return extension_to_language.get(extension, "")
 
 
@@ -71,7 +72,9 @@ def dump_files_to_markdown(
             continue
 
         relative_path = file_path.relative_to(base_path)
-        language = get_language_from_extension(file_path.suffix.lstrip("."))
+        language = get_language(file_path)
+        print(file_path.suffix.lstrip("."))
+        print(f"{language=}")
         try:
             content = file_path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
