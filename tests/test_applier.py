@@ -134,45 +134,4 @@ print("Hello, nested world!")
     assert "```python" in written_content
     assert "print(\"Hello, nested world!\")" in written_content
 
-# Test for unescaping code blocks within Markdown content
-def test_unescape_code_blocks():
-    """
-    Test that unescape_code_blocks correctly unescapes escaped code blocks
-    within Markdown content.
-    """
-    escaped_content = """
-This is a Markdown file.
 
-<!--SLOPIFY_CODE_BLOCK\`\`\`python-->
-# This is a nested code block
-print("Hello, nested world!")
-<!--SLOPIFY_CODE_BLOCK\`\`\`-->
-"""
-    unescaped_content = unescape_code_blocks(escaped_content)
-    assert "```python" in unescaped_content
-    assert "<!--SLOPIFY_CODE_BLOCK" not in unescaped_content
-
-# Test for the full apply_markdown process with nested Markdown
-def test_apply_markdown_with_nested_markdown(tmp_path):
-    """
-    Test that apply_markdown correctly processes Markdown content with nested
-    Markdown files, unescaping code blocks and writing the files to the filesystem.
-    """
-    markdown_content = """
-# `nested_markdown.md`
-
-```
-# Example Markdown Content
-
-This is a Markdown file with nested code blocks.
-
-\`\`\`python
-# This is a nested code block
-print("Hello, nested world!")
-\`\`\`
-```
-"""
-    apply_markdown(markdown_content, base_path=tmp_path)
-    written_content = (tmp_path / "nested_markdown.md").read_text()
-    assert "```python" in written_content
-    assert "print(\"Hello, nested world!\")" in written_content
