@@ -1,9 +1,7 @@
 import typing as ty
-import argparse
 import logging
 from pydantic import BaseModel
 from markdown_it import MarkdownIt
-from markdown_it.token import Token
 from pathlib import Path
 
 
@@ -36,6 +34,7 @@ class FileContent(BaseModel):
         content (str): The main content to be written to the file.
         extra_content (str): Any additional content that is not part of the main content.
     """
+
     path: Path
     content: str
     extra_content: str = ""  # Additional attribute for extra content
@@ -49,12 +48,12 @@ def parse_markdown_headings(markdown_text: str) -> dict[str, str]:
         markdown_text (str): The Markdown text to be parsed.
 
     Returns:
-        Dict[str, str]: A dictionary where each key is an H1 heading and 
+        Dict[str, str]: A dictionary where each key is an H1 heading and
                         the value is the content under that heading.
     """
     md = MarkdownIt()
     tokens = md.parse(markdown_text)
-    lines = markdown_text.split('\n')
+    lines = markdown_text.split("\n")
 
     headings = {}
     current_heading = None
@@ -63,15 +62,15 @@ def parse_markdown_headings(markdown_text: str) -> dict[str, str]:
     i = 0
     while i < len(tokens):
         token = tokens[i]
-        if token.type == 'heading_open' and token.tag == 'h1':
+        if token.type == "heading_open" and token.tag == "h1":
             if current_heading is not None:
-                content_lines = lines[current_heading_line + 1:token.map[0]]
-                headings[current_heading] = '\n'.join(content_lines).strip()
-
+                content_lines = lines[current_heading_line + 1 : token.map[0]]
+                headings[current_heading] = "\n".join(content_lines).strip()
+            assert isinstance(token.map, list)
             current_heading_line = token.map[0]
             i += 1  # Move to the next token
 
-            while i < len(tokens) and tokens[i].type != 'inline':
+            while i < len(tokens) and tokens[i].type != "inline":
                 i += 1
 
             if i < len(tokens):
@@ -82,13 +81,15 @@ def parse_markdown_headings(markdown_text: str) -> dict[str, str]:
             i += 1  # Move to the next token
 
     if current_heading is not None:
-        content_lines = lines[current_heading_line + 1:]
-        headings[current_heading] = '\n'.join(content_lines).strip()
+        content_lines = lines[current_heading_line + 1 :]
+        headings[current_heading] = "\n".join(content_lines).strip()
 
     return headings
-    
 
-def create_file_contents_from_markdown(markdown_text: str, base_path: str) -> list[FileContent]:
+
+def create_file_contents_from_markdown(
+    markdown_text: str, base_path: Path
+) -> list[FileContent]:
     """
     Creates FileContent objects from a Markdown string where each H1 heading denotes a file path.
 
@@ -103,12 +104,13 @@ def create_file_contents_from_markdown(markdown_text: str, base_path: str) -> li
     file_contents = []
 
     for heading, content in parsed_headings.items():
-        file_path = heading.strip('`')
+        file_path = heading.strip("`")
         full_path = Path(base_path) / file_path
         file_content = FileContent(path=full_path, content=content)
         file_contents.append(file_content)
 
     return file_contents
+
 
 def postprocess_content(file_content: FileContent) -> FileContent:
     """
@@ -123,7 +125,7 @@ def postprocess_content(file_content: FileContent) -> FileContent:
     Returns:
         FileContent: The post-processed FileContent object.
     """
-    if file_content.path.suffix == '.md':
+    if file_content.path.suffix == ".md":
         # Remove enclosing code block syntax for Markdown files
         try:
             start = file_content.content.index("```markdown") + len("```markdown")
@@ -137,16 +139,21 @@ def postprocess_content(file_content: FileContent) -> FileContent:
         # Handle non-Markdown files
         try:
             start = file_content.content.index("```") + 3
-            end_of_start_line = file_content.content.index('\n', start)
+            end_of_start_line = file_content.content.index("\n", start)
             start_content = end_of_start_line + 1
             end = file_content.content.index("```", start_content)
             processed_content = file_content.content[start_content:end].strip()
-            extra_content = file_content.content[:start] + file_content.content[end+3:]
+            extra_content = (
+                file_content.content[:start] + file_content.content[end + 3 :]
+            )
         except ValueError:
             processed_content = file_content.content
             extra_content = ""
 
-    return FileContent(path=file_content.path, content=processed_content, extra_content=extra_content)
+    return FileContent(
+        path=file_content.path, content=processed_content, extra_content=extra_content
+    )
+
 
 def write_files(file_contents: list[FileContent]):
     """
@@ -162,9 +169,12 @@ def write_files(file_contents: list[FileContent]):
     """
     for file_content in file_contents:
         file_path = file_content.path
-        file_path.parent.mkdir(parents=True, exist_ok=True)  # Create directories if needed
-        with file_path.open('w', encoding='utf-8') as file:
+        file_path.parent.mkdir(
+            parents=True, exist_ok=True
+        )  # Create directories if needed
+        with file_path.open("w", encoding="utf-8") as file:
             file.write(file_content.content)
+
 
 def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
     """

@@ -84,8 +84,6 @@ def test_dump_files_to_markdown_nested_structure(nested_test_files, tmp_path):
 
 def test_get_language_from_extension():
     # Test the language detection from file extension
-    assert (
-        get_language(Path("a.py")) == "python"
-    )  # Remove the dot from the extension
+    assert get_language(Path("a.py")) == "python"  # Remove the dot from the extension
     assert get_language(Path("b.js")) == "javascript"
     # Add more assertions for different extensions

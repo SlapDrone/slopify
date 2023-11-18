@@ -1,6 +1,7 @@
 import pytest
-from slopify.applier import *
+from slopify.applier import apply_markdown, FileContent, write_files
 from pathlib import Path
+
 
 @pytest.fixture
 def markdown_content_basic():
@@ -11,6 +12,7 @@ def markdown_content_basic():
 print('Hello, world!')
 ```
 """
+
 
 @pytest.fixture
 def markdown_content_multiple_files():
@@ -28,10 +30,12 @@ print('File 2 contents')
 ```
 """
 
+
 def test_apply_markdown_basic(tmp_path, markdown_content_basic):
     apply_markdown(markdown_content_basic, base_path=tmp_path)
     output_file = tmp_path / "test_basic.py"
     assert output_file.read_text(encoding="utf-8") == "print('Hello, world!')"
+
 
 def test_apply_markdown_multiple_files(tmp_path, markdown_content_multiple_files):
     apply_markdown(markdown_content_multiple_files, base_path=tmp_path)
@@ -39,6 +43,7 @@ def test_apply_markdown_multiple_files(tmp_path, markdown_content_multiple_files
     output_file2 = tmp_path / "test_file2.py"
     assert output_file1.read_text(encoding="utf-8") == "print('File 1 contents')"
     assert output_file2.read_text(encoding="utf-8") == "print('File 2 contents')"
+
 
 def test_apply_markdown_empty_code_block(tmp_path):
     markdown_content_empty = """
@@ -51,6 +56,7 @@ def test_apply_markdown_empty_code_block(tmp_path):
     apply_markdown(markdown_content_empty, base_path=tmp_path)
     output_file = tmp_path / "test_empty.py"
     assert output_file.read_text(encoding="utf-8") == ""
+
 
 def test_apply_markdown_nested_structure(tmp_path):
     markdown_content_nested = """
@@ -91,12 +97,10 @@ This is a Markdown file with nested code blocks.
 # This is a nested code block
 print("Hello, nested world!")
 <!--SLOPIFY_CODE_BLOCK```-->
-"""
+""",
     )
     write_files([file_content])
     # Read the file and check the content
     written_content = Path("nested_markdown.md").read_text()
     assert "```python" in written_content
-    assert "print(\"Hello, nested world!\")" in written_content
-
-
+    assert 'print("Hello, nested world!")' in written_content

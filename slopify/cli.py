@@ -68,7 +68,7 @@ def slather(
     ),
     base: Path = typer.Option(
         None, "--base", "-b", help="Base directory for applying the code."
-    )
+    ),
 ):
     base_path = base or Path.cwd()
     if markdown_file:
@@ -86,4 +86,3 @@ def slather(
 
 if __name__ == "__main__":
     app()
-
