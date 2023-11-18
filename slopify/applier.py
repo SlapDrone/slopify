@@ -1,9 +1,14 @@
 import typing as ty
 import argparse
+import logging
 from pydantic import BaseModel
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 from pathlib import Path
+
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def unescape_code_blocks(content: str) -> str:
@@ -55,6 +60,9 @@ def parse_markdown(tokens: list[Token], base_path: Path) -> list[FileContent]:
     """
     Parses a list of Markdown tokens and extracts the file paths and contents.
 
+    The markdown tokens are presumed to come from a slopify markdown dump, 
+    i.e. markdown used to serialise file contents in a specific way.
+
     This function assumes that each file's content is represented as a code block
     immediately following an H1 heading with the file's relative path. 
     For Markdown files, all content between file headers is included. It also
@@ -74,7 +82,7 @@ def parse_markdown(tokens: list[Token], base_path: Path) -> list[FileContent]:
     capture_markdown_content = False  # Flag to capture all content for Markdown files
 
     for token in tokens:
-        if token.type == 'heading_open' and token.tag == 'h1':
+        if token.type == 'heading_open' and token.tag == 'h1' and not capture_markdown_content:
             # If we already have a path and content, save them before starting a new file
             if current_path is not None:
                 content = '\n'.join(current_content_lines)
@@ -92,6 +100,11 @@ def parse_markdown(tokens: list[Token], base_path: Path) -> list[FileContent]:
             if token.type == 'fence':
                 # For code blocks, capture the content including the backticks and language info
                 current_content_lines.append(unescape_code_blocks(token.content))#f"```{token.info}\n{token.content}```")
+            elif token.type == 'heading_open':
+                # preserve heading level based on tag
+                heading_level = token.tag.lstrip("h")
+                current_content_lines.append(f"{'#' * int(heading_level)}")
+                continue
             else:
                 # For non-code block content, capture the raw content
                 current_content_lines.append(token.content)
@@ -144,12 +157,12 @@ def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
     # Step 2: Refine the Parsing Logic
     base_path = base_path or Path.cwd()
     file_contents = parse_markdown(tokens, base_path)
-
+    logger.debug(f"{file_contents=}")
     # Step 4: Handle Special Cases
     for file_content in file_contents:
         if file_content.path.suffix == '.md':
             file_content.content = unescape_code_blocks(file_content.content)
-
+    logger.debug(f"{file_contents=}")
     # Step 3: Verify File Writing Logic
     write_files(file_contents)
 
