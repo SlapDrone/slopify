@@ -15,6 +15,13 @@ Installing Slopify is as easy as pie, which, coincidentally, might be what your 
 poetry add slopify
 ```
 
+or:
+
+```bash
+# Install with pip
+pip install slopify
+```
+
 ## Usage
 
 To copy your codebase into the system clipboard for Slopify, just run:
