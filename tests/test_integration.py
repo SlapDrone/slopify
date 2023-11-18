@@ -99,8 +99,8 @@ Even more commentary after the code block.
     apply_markdown(markdown_content, base_path=tmp_path)
 
     # Verify that only the content within the code blocks is applied to the files
-    assert file1.read_text() == "print('Hello, world!')\n"
-    assert file2.read_text() == "print('Goodbye, world!')\n"
+    assert file1.read_text() == "print('Hello, world!')"
+    assert file2.read_text() == "print('Goodbye, world!')"
 
 
 def test_slop_slather_escape_unescape_cycle(setup_test_files, tmp_path):

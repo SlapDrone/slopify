@@ -27,97 +27,120 @@ def unescape_code_blocks(content: str) -> str:
     return content.replace("<!--SLOPIFY_CODE_BLOCK```-->", "```")
 
 
-# def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
-#     """
-#     Writes a set of files serialised as slopify markdown back to the file system.
-
-#     For every type of included file except markdown files, this just writes the code 
-#     blocks, which by construction represent the file content.
-
-#     For markdown files themselves (for example, README.md, CONTRIBUTING.md) which 
-#     are serialised inside slopify markdown, we have to deal with the case where 
-#     markdown content (represented by a markdown code block) must be written back 
-#     to a markdown file. This markdown code block may itself include
-#     code blocks which have been escaped by slopify upon serialisation. The full 
-#     contents of this markdown code block must be written back to a markdown file 
-#     with the code blocks unescaped.
-#     """
-#     md = MarkdownIt()
-#     tokens = md.parse(markdown_content)
-
 class FileContent(BaseModel):
     """
-    A simple data structure to hold the path and content for a file.
+    A data structure to hold the path and content for a file, along with any extra content.
 
     Attributes:
         path (Path): The path where the file should be written.
-        content (str): The content to be written to the file.
+        content (str): The main content to be written to the file.
+        extra_content (str): Any additional content that is not part of the main content.
     """
     path: Path
     content: str
+    extra_content: str = ""  # Additional attribute for extra content
 
-def parse_markdown(tokens: list[Token], base_path: Path) -> list[FileContent]:
+
+def parse_markdown_headings(markdown_text: str) -> dict[str, str]:
     """
-    Parses a list of Markdown tokens and extracts the file paths and contents.
-
-    The markdown tokens are presumed to come from a slopify markdown dump, 
-    i.e. markdown used to serialise file contents in a specific way.
-
-    This function assumes that each file's content is represented as a code block
-    immediately following an H1 heading with the file's relative path. 
-    For Markdown files, all content between file headers is included. It also
-    handles the special case of Markdown files that may contain nested code blocks,
-    which need to be unescaped before writing back to the file system.
+    Parses a Markdown string and extracts content under each H1 heading.
 
     Args:
-        tokens (list[Token]): A list of tokens obtained from parsing Markdown content.
-        base_path (Path): The base path relative to which file paths will be resolved.
+        markdown_text (str): The Markdown text to be parsed.
 
     Returns:
-        list[FileContent]: A list of FileContent objects with extracted paths and contents.
+        Dict[str, str]: A dictionary where each key is an H1 heading and 
+                        the value is the content under that heading.
     """
+    md = MarkdownIt()
+    tokens = md.parse(markdown_text)
+    lines = markdown_text.split('\n')
+
+    headings = {}
+    current_heading = None
+    current_heading_line = -1
+
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        if token.type == 'heading_open' and token.tag == 'h1':
+            if current_heading is not None:
+                content_lines = lines[current_heading_line + 1:token.map[0]]
+                headings[current_heading] = '\n'.join(content_lines).strip()
+
+            current_heading_line = token.map[0]
+            i += 1  # Move to the next token
+
+            while i < len(tokens) and tokens[i].type != 'inline':
+                i += 1
+
+            if i < len(tokens):
+                current_heading = tokens[i].content
+                i += 1  # Skip past the inline token
+
+        else:
+            i += 1  # Move to the next token
+
+    if current_heading is not None:
+        content_lines = lines[current_heading_line + 1:]
+        headings[current_heading] = '\n'.join(content_lines).strip()
+
+    return headings
+    
+
+def create_file_contents_from_markdown(markdown_text: str, base_path: str) -> list[FileContent]:
+    """
+    Creates FileContent objects from a Markdown string where each H1 heading denotes a file path.
+
+    Args:
+        markdown_text (str): The Markdown text representing serialized files.
+        base_path (str): The base path to be prefixed to each file path.
+
+    Returns:
+        List[FileContent]: A list of FileContent objects representing the files.
+    """
+    parsed_headings = parse_markdown_headings(markdown_text)
     file_contents = []
-    current_path = None
-    current_content_lines = []
-    capture_markdown_content = False  # Flag to capture all content for Markdown files
 
-    for token in tokens:
-        if token.type == 'heading_open' and token.tag == 'h1' and not capture_markdown_content:
-            # If we already have a path and content, save them before starting a new file
-            if current_path is not None:
-                content = '\n'.join(current_content_lines)
-                file_contents.append(FileContent(path=current_path, content=content))
-            current_path = None
-            current_content_lines = []
-            capture_markdown_content = False  # Reset the flag
-        elif token.type == 'inline' and current_path is None:
-            # Extract the file path from the inline token's content
-            current_path = base_path / token.content.strip('`')
-            # Check if the current file is a Markdown file
-            capture_markdown_content = current_path.suffix == '.md'
-        elif capture_markdown_content:
-            # Capture all content for Markdown files
-            if token.type == 'fence':
-                # For code blocks, capture the content including the backticks and language info
-                current_content_lines.append(unescape_code_blocks(token.content))#f"```{token.info}\n{token.content}```")
-            elif token.type == 'heading_open':
-                # preserve heading level based on tag
-                heading_level = token.tag.lstrip("h")
-                current_content_lines.append(f"{'#' * int(heading_level)}")
-                continue
-            else:
-                # For non-code block content, capture the raw content
-                current_content_lines.append(token.content)
-        elif token.type == 'fence' and current_path is not None and not capture_markdown_content:
-            # For non-Markdown files, capture only the code block content
-            current_content_lines.append(token.content)
-
-    # Handle the last file content if any
-    if current_path is not None:
-        content = '\n'.join(current_content_lines)
-        file_contents.append(FileContent(path=current_path, content=content))
+    for heading, content in parsed_headings.items():
+        file_path = heading.strip('`')
+        full_path = Path(base_path) / file_path
+        file_content = FileContent(path=full_path, content=content)
+        file_contents.append(file_content)
 
     return file_contents
+
+def postprocess_content(file_content: FileContent) -> FileContent:
+    """
+    Post-processes the content of a FileContent object based on its file type.
+
+    For Markdown files (.md), it unescapes commented-out code blocks.
+    For non-Markdown files, it extracts only the content of the single code block,
+    handling the potential presence of a language identifier.
+
+    Args:
+        file_content (FileContent): The FileContent object to be post-processed.
+
+    Returns:
+        FileContent: The post-processed FileContent object.
+    """
+    if file_content.path.suffix == '.md':
+        processed_content = file_content.content.replace("<!--SLOPIFY_CODE_BLOCK```-->", "```")
+        extra_content = ""
+    else:
+        try:
+            # Find the start of the code block (accounting for a language identifier)
+            start = file_content.content.index("```") + 3
+            end_of_start_line = file_content.content.index('\n', start)
+            start_content = end_of_start_line + 1
+            end = file_content.content.index("```", start_content)
+            processed_content = file_content.content[start_content:end].strip()
+            extra_content = file_content.content[:start] + file_content.content[end+3:]
+        except ValueError:
+            processed_content = file_content.content
+            extra_content = ""
+
+    return FileContent(path=file_content.path, content=processed_content, extra_content=extra_content)
 
 def write_files(file_contents: list[FileContent]):
     """
@@ -137,7 +160,6 @@ def write_files(file_contents: list[FileContent]):
         with file_path.open('w', encoding='utf-8') as file:
             file.write(file_content.content)
 
-
 def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
     """
     Applies Markdown content to the filesystem, writing files as described in the content.
@@ -151,25 +173,13 @@ def apply_markdown(markdown_content: str, base_path: ty.Optional[Path] = None):
         markdown_content (str): The Markdown content to be applied.
         base_path (Path, optional): The base directory for applying the code. Defaults to the current working directory.
     """
-    md = MarkdownIt()
-    tokens = md.parse(markdown_content)
-
-    # Step 2: Refine the Parsing Logic
     base_path = base_path or Path.cwd()
-    file_contents = parse_markdown(tokens, base_path)
-    logger.debug(f"{file_contents=}")
-    # Step 4: Handle Special Cases
-    for file_content in file_contents:
-        if file_content.path.suffix == '.md':
-            file_content.content = unescape_code_blocks(file_content.content)
-    logger.debug(f"{file_contents=}")
-    # Step 3: Verify File Writing Logic
-    write_files(file_contents)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Apply Markdown file to directory.")
-    parser.add_argument(
-        "markdown_file", type=str, help="Path to the Markdown file to apply."
-    )
-    args = parser.parse_args()
-    apply_markdown(args.markdown_file)
+    # Step 1: Parse Markdown content to get file paths and contents
+    file_contents = create_file_contents_from_markdown(markdown_content, base_path)
+
+    # Step 2: Post-process each FileContent object (e.g., unescape code blocks in Markdown)
+    postprocessed_contents = [postprocess_content(fc) for fc in file_contents]
+
+    # Step 3: Write the content of each FileContent object to the filesystem
+    write_files(postprocessed_contents)
