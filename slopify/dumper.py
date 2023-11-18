@@ -39,6 +39,8 @@ def escape_markdown_content(content: str) -> str:
     """
     escaped_content = []
     in_code_block = False
+    print("ESCAPE")
+    print(f"{content=}")
     for line in content.splitlines():
         if line.startswith("```"):
             in_code_block = not in_code_block
