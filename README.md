@@ -1,14 +1,22 @@
 # Slopify
 
-Welcome to the kitchen of coding chaos, where Slopify takes your meticulously crafted source code and blends it into a fine puree of potential and possibilities. It's like a culinary adventure for your codebase, except the chef is a language model with a taste for the unpredictable.
+Tired of copying and pasting code to and from your favourte LLM while you try to figure out whether its worth making it do your work for you or whether you'd be faster doing it yourself?
+
+Do you reflexively spit at the notion of letting an autoregressive language model fumble around autonomously in your home or on your computer, lest it knock over your vases or forward those e-mails you sent to noam chomsky to your wife? 
+
+Does doing RAG just seem like a picking out a fragile mystery box from a store that sells an assortment of rube-goldberg machines, each bestowed with many adjectives, and then using it to make financial decisions?
+
+Do you identify with [the spirit of the barbarian](https://www.cracked.com/blog/the-way-of-the-barbarian-infusing-your-spiritual-life-with-conan) before that of the sorcerer?
+
+If you answered yes to all of the above, you might want to try `slopify`.
 
 ## What's Slopify?
 
-Slopify is the digital equivalent of a food fight, but with code. It's a tool that slurps up your source code, feeds it to a ravenous Language Learning Model (LLM), and waits for the LLM to regurgitate a new concoction of code suggestions. Then, with the grace of a starved hyena, Slopify gobbles up the LLM's output and smears it back into your project.
+Slopify is a blunt instrument that dutifully sucks up all the source code you point it at and smashes it all together in a big markdown sandwich and serves you it up on your ~clipboard~slop bucket (or to a file). You can let your favourite stochastic parrot loose on this diabolical slurry and, by priming it with an appropriate system message, have it vomit it back up transformed by the other contents of its stomach. Slopify will help you slather that hot mess right back in there in all the right places before anybody else notices.
 
 ## Installation
 
-Installing Slopify is as easy as pie, which, coincidentally, might be what your code resembles after using it:
+Installing Slopify is much cleaner than you may be liable to feel after using it:
 
 ```bash
 # Install via Poetry
@@ -24,18 +32,33 @@ pip install slopify
 
 ## Usage
 
-To copy your codebase into the system clipboard for Slopify, just run:
+To serialise some (or all) of your codebase into a big old markdown sandwich delivered straight to your system clipboard, just run:
 
 ```bash
-# Copy your code into the system clipboard
-slopify slop /path/to/your/code
+# everything
+slopify slop .
 ```
+
+or:
+
+```bash
+# recursive, targeted
+slopify slop -r src/preprocessing/
+```
+
+or: 
+
+```bash
+# glob
+slopify slop **/*.h
+```
+
+You get the idea.
 
 If you prefer to dump your code into a Markdown file instead of the clipboard, use the `-o` flag:
 
 ```bash
-# Dump your code into a Markdown file
-slopify slop /path/to/your/code -o slop_bucket.md
+slopify slop -o slop.md src/
 ```
 
 To apply suggestions from the system clipboard back onto your codebase:
@@ -62,10 +85,4 @@ slopify slather -i vomit.md
 
 ## Disclaimer
 
-Slopify is not responsible for any indigestion, nausea, or existential dread that may result from its use. It's recommended to keep a defibrillator handy for your codebase, just in case.
-
-## Bon Appétit!
-
-Now go forth and let Slopify turn your code into the ultimate potluck, where every line is a surprise and every function is a mystery dish. Who knows, you might just discover the secret sauce that's been missing all along—or you'll end up with a Franken-code monster. Either way, it'll be a meal to remember!
-
-Remember, Slopify is all about embracing the chaos in the quest for coding excellence—or at least some good laughs along the way. Enjoy the mess!
+Slopify is not responsible for any indigestion, nausea, or existential dread that may result from its use. It's recommended to keep a defibrillator handy for your codebase, just in case. Enjoy the absurdity of the era.
