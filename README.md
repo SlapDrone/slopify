@@ -4,7 +4,7 @@ Tired of copying and pasting code to and from your favourte LLM while you try to
 
 Do you reflexively spit at the notion of letting an autoregressive language model fumble around autonomously in your home or on your computer, lest it knock over your vases or forward those e-mails you sent to noam chomsky to your wife? 
 
-Does doing RAG just seem like a picking out a fragile mystery box from a store that sells an assortment of rube-goldberg machines, each bestowed with many adjectives, and then using it to make financial decisions?
+Does doing RAG just seem like a picking out a fragile mystery box from a store that sells an assortment of rube-goldberg machines, each bestowed with many adjectives, and then putting it in charge of all your financial decisions?
 
 Do you identify with [the spirit of the barbarian](https://www.cracked.com/blog/the-way-of-the-barbarian-infusing-your-spiritual-life-with-conan) before that of the sorcerer?
 
