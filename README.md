@@ -74,7 +74,7 @@ If you have suggestions in a file instead of the clipboard, use the `-i` flag:
 # Apply suggestions from a Markdown file
 slopify slather -i vomit.md
 ```
-## TODO
+## TODO (idea slop, PRs welcome)
 
 - [ ] support line numbers 
 - [ ] accept diffs in apply markdown (prerequisite above)
@@ -87,6 +87,8 @@ slopify slather -i vomit.md
     - perhaps anticipate an explicit "new file" flag to deal with cases where new file creation intentional
 - [ ] automatically generate relevant context from dependent modules with some static code analysis? (nice to have)
 - [ ] support jupyter notebooks (grab code cell contents only - nice to have)
+- [ ] Add a templating abstraction layer to define the slop structure flexibly for a given file (e.g. with jinja2 `# {{file.path}`)
+    - make a concrete bridge to prompting primitives
 - [ ] use [Outlines](https://github.com/outlines-dev/outlines) to constrain generation to valid slop
 
 ## Disclaimer
