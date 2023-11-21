@@ -76,7 +76,9 @@ slopify slather -i vomit.md
 ```
 ## TODO
 
-- [ ] accept diffs in apply markdown
+- [ ] support line numbers 
+- [ ] accept diffs in apply markdown (prerequisite above)
+    - or explicit git patches, saving on tokens
 - [ ] allow configurable token limit for dump with graceful failure when overbudget
 - [ ] allow specifying sets of interdependent files commonly needed to be assessed jointly.
     - shell command e.g. `slopify set create my_set ...`
