@@ -12,7 +12,7 @@ If you answered yes to all of the above, you might want to try `slopify`.
 
 ## What's Slopify?
 
-Slopify is a blunt instrument that dutifully sucks up all the source code you point it at and smashes it all together in a big markdown sandwich and serves you it up on your ~clipboard~slop bucket (or to a file). You can let your favourite stochastic parrot loose on this diabolical slurry and, by priming it with an appropriate system message, have it vomit it back up transformed by the other contents of its stomach. Slopify will help you slather that hot mess right back in there in all the right places before anybody else notices.
+Slopify is a blunt instrument that dutifully sucks up all the source code you point it at and smashes it all together in a big markdown sandwich and serves you it up on your ~clipboard~ slop bucket (or to a file). You can let your favourite stochastic parrot loose on this diabolical slurry and, by priming it with an appropriate system message, have it vomit it back up rearranged and mingled with the other contents of its stomach. Slopify will help you slather that hot mess right back in there in all the right places before anybody else notices.
 
 ## Installation
 
@@ -82,6 +82,8 @@ slopify slather -i vomit.md
     - shell command e.g. `slopify set create my_set ...`
     - config file e.g. `slopify dump -c my_set`
 - [ ] automatically generate relevant context from dependent modules with some static code analysis? (nice to have)
+- [ ] support jupyter notebooks (grab code cell contents only)
+- [ ] use [Outlines](https://github.com/outlines-dev/outlines) to constrain generation to valid slop
 
 ## Disclaimer
 
