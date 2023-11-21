@@ -81,8 +81,10 @@ slopify slather -i vomit.md
 - [ ] allow specifying sets of interdependent files commonly needed to be assessed jointly.
     - shell command e.g. `slopify set create my_set ...`
     - config file e.g. `slopify dump -c my_set`
+- [ ] check outputs conform to file system (validation before slather)
+    - perhaps anticipate an explicit "new file" flag to deal with cases where new file creation intentional
 - [ ] automatically generate relevant context from dependent modules with some static code analysis? (nice to have)
-- [ ] support jupyter notebooks (grab code cell contents only)
+- [ ] support jupyter notebooks (grab code cell contents only - nice to have)
 - [ ] use [Outlines](https://github.com/outlines-dev/outlines) to constrain generation to valid slop
 
 ## Disclaimer
